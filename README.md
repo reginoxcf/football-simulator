@@ -1,4 +1,17 @@
-# football-simulator
-random football league simulator
+# Football Simulator
+This is a random football league simulator (not yet accurate) based on attack and defense stats.
 
-use generator.cpp to generate a team list and simulator.cpp to simulate a league
+Steps to install (Windows)
+----------------
+1. Install the GNU GCC Compiler through [MSYS2](https://www.msys2.org/)
+2. Check that GCC is installed by running:
+   ```
+   gcc --version
+   g++ --version
+   gdb --version
+   ```
+3. Navigate to the engine folder and then run:
+   ```
+   g++ -o generator generator.cpp&generator.exe
+   g++ -o simulator simulator.cpp&simulator.exe
+   ```
