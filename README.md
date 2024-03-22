@@ -13,6 +13,10 @@ Steps to install (Windows)
 3. Navigate to the engine folder and then run:
    ```
    g++ -o generator generator.cpp&generator.exe
+   ```
+4. Input number of teams
+5. Run
+   ```
    g++ -o simulator simulator.cpp&simulator.exe
    ```
 Known bugs
