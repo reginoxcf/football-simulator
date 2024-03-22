@@ -1,5 +1,5 @@
 # Football Simulator
-This is a random football league simulator (not yet accurate) based on attack and defense stats.
+Text-based random football league simulator (not yet accurate) based on attack and defense stats.
 
 Steps to install (Windows)
 ----------------
