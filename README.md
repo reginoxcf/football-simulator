@@ -17,7 +17,7 @@ Steps to install (Windows)
    ```
 Known bugs
 ------------
-- [] Standings table will break when stats overflow
+- [ ] Standings table will break when stats overflow
 
 Planned features
 ---------------
