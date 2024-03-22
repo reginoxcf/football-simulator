@@ -7,6 +7,7 @@ struct stats{
 	int gf, ga, gd, pts, w, l, d, mp;
 	string name;
 } teamStats[maxTeams];
+string command;
 
 bool comp(stats &x, stats &y){
 	if(x.pts != y.pts) return x.pts > y.pts;
@@ -17,7 +18,7 @@ bool comp(stats &x, stats &y){
 
 int noOfTeams;
 team teamList[maxTeams+1];
-vector<pair<int, int>> matches;
+vector<pair<int, int>> matches, matches2;
 
 void generateOrder(int n){
     vector<int> tmp; tmp.clear();
@@ -53,15 +54,12 @@ void printStandings(){
     sort(teamStats, teamStats+noOfTeams, comp);
 	cout << "#   | Club | MP  | W   | D   | L   | GF   | GA   | GD   | Pts   |\n";
 	int rnk = 0;
-//	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-//	SetConsoleTextAttribute(hConsole, 31);
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, 31);
 	for(auto x:teamStats){
 		rnk++;
-//		if(rnk == 5) SetConsoleTextAttribute(hConsole, 47);
-//		if(rnk == 6) SetConsoleTextAttribute(hConsole, 63);
-//		if(rnk == 7) SetConsoleTextAttribute(hConsole, 15);
-//		if(rnk == noOfTeams-2) SetConsoleTextAttribute(hConsole, 111);
-//		if(rnk == noOfTeams-1) SetConsoleTextAttribute(hConsole, 79);
+		if(rnk == 3) SetConsoleTextAttribute(hConsole, 15);
+		if(rnk == noOfTeams-1) SetConsoleTextAttribute(hConsole, 79);
 		print(to_string(rnk), 4);
 		print(x.name, 5);
 		print(to_string(x.mp), 4);
@@ -75,34 +73,69 @@ void printStandings(){
 		cout << "\n";
 		if(rnk >= noOfTeams) break;
 	}
-//	SetConsoleTextAttribute(hConsole, 15);
+	SetConsoleTextAttribute(hConsole, 15);
 //	cout << "\n#   | Club | MP  | W   | D   | L   | GF   | GA   | GD   | Pts   |\n";
 }
 
+void simulateMatch(int id){
+    int ho = matches[id].first, aw = matches[id].second;
+    pair<int, int> res = simulate(teamList[ho], teamList[aw]);
+    cout << teamStats[ho].name << " " << res.first << " - " << res.second << " " << teamStats[aw].name << "\n";
+    updateStats(ho, res);
+    updateStats(aw, {res.second, res.first});
+}
+
 int main(){
-	freopen("teams.txt","r",stdin);
+	ifstream file("teams.txt");
 	// freopen("results.txt","w",stdout);
-	cin >> noOfTeams;
+	file >> noOfTeams;
 	for(int i = 0; i < noOfTeams; i++){
-		cin >> teamStats[i].name >> teamList[i].att >> teamList[i].def;
+		file >> teamStats[i].name >> teamList[i].att >> teamList[i].def;
 	}
-//	for(int i = 0; i < noOfTeams; i++){
-//        cout << teamStats[i].name << " " << teamList[i].att << " " << teamList[i].def << "\n";
-//	}
+	cout << "Teams imported from teams.txt\n";
+	file.close();
 	generateOrder(noOfTeams);
-	pair<int, int> res;
-	for(auto [i, j]:matches) matches.emplace_back(j, i);
-	int id = -1, ho, aw;
-	for(int i = 0; i < 2*noOfTeams-2; i++){
-        cout << "Matchday " << i+1 << "\n";
-        for(int j = 0; j < noOfTeams/2; j++){
-            id++;
-            ho = matches[id].first, aw = matches[id].second;
-            res = simulate(teamList[ho], teamList[aw]);
-            cout << teamStats[ho].name << " " << res.first << " - " << res.second << " " << teamStats[aw].name << "\n";
-            updateStats(ho, res);
-            updateStats(aw, {res.second, res.first});
+	for(auto [i, j]:matches) matches2.emplace_back(j, i);
+	matches.insert(matches.end(), matches2.begin(), matches2.end());
+    matches.insert(matches.begin(), {0, 0});
+	cout << "Matches generated\nPress h for help!\n>>> ";
+	int id = 0;
+	while(true){
+        cin >> command;
+        if(command == "h"){
+            cout << "h: help\n";
+            cout << "st: print statistics\n";
+            cout << "s: print standings\n";
+            cout << "nm: simulate next match\n";
+            cout << "nmd: simulate until end of matchday\n";
+            cout << "tl: print team list\n";
         }
-        printStandings();
+        else if(command == "s"){
+            printStandings();
+        }
+        else if(command == "nm"){
+            //next match
+            id++; simulateMatch(id);
+        }
+        else if(command == "nmd"){
+            //til we meet again
+            id++; simulateMatch(id);
+            while(id % (noOfTeams/2)){id++; simulateMatch(id);}
+        }
+        else if(command == "st"){
+            cout << "Matches played: " << id << "\n";
+            cout << "Current matchday: " << (id+noOfTeams/2-1)/(noOfTeams/2) << "\n";
+            if(id < (noOfTeams)*(noOfTeams-1))
+                cout << "Next match: " << teamStats[matches[id+1].first].name << " - " << teamStats[matches[id+1].second].name << "\n";
+        }
+        else if(command == "tl"){
+            for(int i = 0; i < noOfTeams; i++){
+                cout << teamStats[i].name << " " << teamList[i].att << " " << teamList[i].def << "\n";
+            }
+        }
+        if(id >= (noOfTeams)*(noOfTeams-1)) break;
+        cout << ">>> ";
 	}
+	cout << "Final Standings:\n";
+	printStandings();
 }
