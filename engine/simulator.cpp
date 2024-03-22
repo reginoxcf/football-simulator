@@ -20,11 +20,15 @@ team teamList[maxTeams+1];
 vector<pair<int, int>> matches;
 
 void generateOrder(int n){
-	for(int i = 0; i < n; i++){
-		for(int j = 0; j < n; j++){
-			if(i==j) continue;
-			matches.emplace_back(i, j);
-		}
+    vector<int> tmp; tmp.clear();
+    for(int i = 0; i < n; i++) tmp.push_back(i);
+	for(int i = 0; i < n-1; i++){
+        for(int j = 0; j < n/2; j++){
+            matches.emplace_back(tmp[j], tmp[n-j-1]);
+        }
+        int k = tmp[1];
+        tmp.erase(tmp.begin() + 1);
+        tmp.push_back(k);
 	}
 }
 
@@ -45,35 +49,19 @@ void print(string s, int sp){
 	cout << "| ";
 }
 
-int main(){
-	freopen("teams.txt","r",stdin);
-	freopen("results.txt","w",stdout);
-	cin >> noOfTeams;
-	for(int i = 0; i < noOfTeams; i++){
-		cin >> teamStats[i].name >> teamList[i].att >> teamList[i].def;
-	}
-	shuffle(teamList, teamList+noOfTeams, rng);
-	generateOrder(noOfTeams);
-	shuffle(matches.begin(), matches.end(), rng);
-	pair<int, int> res;
-	for(auto [i, j]:matches){
-		res = simulate(teamList[i], teamList[j]);
-		cout << teamStats[i].name << " " << res.first << " - " << res.second << " " << teamStats[j].name << "\n";
-		updateStats(i, res);
-		updateStats(j, {res.second, res.first});
-	}
-	sort(teamStats, teamStats+noOfTeams, comp);
+void printStandings(){
+    sort(teamStats, teamStats+noOfTeams, comp);
 	cout << "#   | Club | MP  | W   | D   | L   | GF   | GA   | GD   | Pts   |\n";
 	int rnk = 0;
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(hConsole, 31);
+//	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+//	SetConsoleTextAttribute(hConsole, 31);
 	for(auto x:teamStats){
 		rnk++;
-		if(rnk == 5) SetConsoleTextAttribute(hConsole, 47);
-		if(rnk == 6) SetConsoleTextAttribute(hConsole, 63);
-		if(rnk == 7) SetConsoleTextAttribute(hConsole, 15);
-		if(rnk == noOfTeams-2) SetConsoleTextAttribute(hConsole, 111);
-		if(rnk == noOfTeams-1) SetConsoleTextAttribute(hConsole, 79);
+//		if(rnk == 5) SetConsoleTextAttribute(hConsole, 47);
+//		if(rnk == 6) SetConsoleTextAttribute(hConsole, 63);
+//		if(rnk == 7) SetConsoleTextAttribute(hConsole, 15);
+//		if(rnk == noOfTeams-2) SetConsoleTextAttribute(hConsole, 111);
+//		if(rnk == noOfTeams-1) SetConsoleTextAttribute(hConsole, 79);
 		print(to_string(rnk), 4);
 		print(x.name, 5);
 		print(to_string(x.mp), 4);
@@ -84,9 +72,37 @@ int main(){
 		print(to_string(x.ga), 5);
 		print(to_string(x.gd), 5);
 		print(to_string(x.pts), 6);
-		if(rnk >= noOfTeams) break;
 		cout << "\n";
+		if(rnk >= noOfTeams) break;
 	}
-	SetConsoleTextAttribute(hConsole, 15);
-	cout << "\n#   | Club | MP  | W   | D   | L   | GF   | GA   | GD   | Pts   |";
+//	SetConsoleTextAttribute(hConsole, 15);
+//	cout << "\n#   | Club | MP  | W   | D   | L   | GF   | GA   | GD   | Pts   |\n";
+}
+
+int main(){
+	freopen("teams.txt","r",stdin);
+	// freopen("results.txt","w",stdout);
+	cin >> noOfTeams;
+	for(int i = 0; i < noOfTeams; i++){
+		cin >> teamStats[i].name >> teamList[i].att >> teamList[i].def;
+	}
+//	for(int i = 0; i < noOfTeams; i++){
+//        cout << teamStats[i].name << " " << teamList[i].att << " " << teamList[i].def << "\n";
+//	}
+	generateOrder(noOfTeams);
+	pair<int, int> res;
+	for(auto [i, j]:matches) matches.emplace_back(j, i);
+	int id = -1, ho, aw;
+	for(int i = 0; i < 2*noOfTeams-2; i++){
+        cout << "Matchday " << i+1 << "\n";
+        for(int j = 0; j < noOfTeams/2; j++){
+            id++;
+            ho = matches[id].first, aw = matches[id].second;
+            res = simulate(teamList[ho], teamList[aw]);
+            cout << teamStats[ho].name << " " << res.first << " - " << res.second << " " << teamStats[aw].name << "\n";
+            updateStats(ho, res);
+            updateStats(aw, {res.second, res.first});
+        }
+        printStandings();
+	}
 }
