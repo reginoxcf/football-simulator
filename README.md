@@ -15,3 +15,11 @@ Steps to install (Windows)
    g++ -o generator generator.cpp&generator.exe
    g++ -o simulator simulator.cpp&simulator.exe
    ```
+Known bugs
+------------
+- [] Standings table will break when stats overflow
+
+Planned features
+---------------
+- [ ] Make matchday-like fixtures instead of random ones
+- [ ] Make engine more realistic
