@@ -6,7 +6,7 @@
 std::mt19937_64 rng(std::chrono::steady_clock::now().time_since_epoch().count());
 //Mersenne Twister Randomizer
 
-const int goalLimit = 100, moveDistance = 5;
+const int goalLimit = 100, moveDistance = 2;
 
 struct team{
 	//Football team
@@ -33,11 +33,11 @@ int moveDirection(team home, team away){
 std::pair<int, int> simulate(team home, team away){
 	int seconds = 0, ballX = 0, homeGoals = 0, awayGoals = 0; //maximum = 90 * 60 = 5400
 	while(seconds <= 5400){
-		ballX += moveDirection(home, away) * 5;
-		if(ballX <= -100) ++awayGoals;
-		if(ballX >= 100) ++homeGoals;
-		if(abs(ballX) >= 100) ballX = 0;
 		seconds += getRandomInteger(7, 13);
+		ballX += moveDirection(home, away) * moveDistance;
+		if(ballX <= -goalLimit) ++awayGoals;
+		if(ballX >= goalLimit) ++homeGoals;
+		if(abs(ballX) >= goalLimit) ballX = 0;
 	}
 	return {homeGoals, awayGoals};
 }
