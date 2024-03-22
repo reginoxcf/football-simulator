@@ -21,5 +21,5 @@ Known bugs
 
 Planned features
 ---------------
-- [ ] Make matchday-like fixtures instead of random ones
+- [x] Make matchday-like fixtures instead of random ones
 - [ ] Make engine more realistic
